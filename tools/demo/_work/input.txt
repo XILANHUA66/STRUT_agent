@@ -1,0 +1,44 @@
+Please generate some test cases for the following C function.I will provide you a test case example with json format. This example is divide into three parts:inputs,outputs,stubins.We use 'expr', 'type' and 'value' key to represent an input or output data. In the stubins list, I'll provide the called function signature as well as the called function return value or pointer type parameters that the called function may change, and you'll need to decide which data to assign values to based on the test case.Please continue to generate with this format. Satisfy the following requirements.1.Assign values to the data according to the situation you want to test.2.Try to cover all branches.3.Use the stub function to simulate the return value of the called function.I will provide you with all the data that the called function may change.It is up to you to decide which values to change in each test.4.Output legal json format for each test case.
+****The function under test starts****
+/* ============================================================
+ * STRUT demo: focal method `circle`
+ * from the paper (Fig. 2), cleaned up so it compiles as-is.
+ *
+ * This file is the INPUT to the pipeline. It is never modified
+ * in place -- run_demo.py copies it to demo/_work/ first.
+ * ============================================================ */
+#define PI 3.14f
+/* --- unused, should be stripped by simplify_file --- */
+typedef struct
+{
+    float area;
+    float perimeter;
+} Shape;
+/* --- unused, should be stripped by simplify_file --- */
+/* --- prototypes, should be stripped by remove_function_declarations --- */
+/* --- globals --- */
+int area    ;       /* used by circle  -> initializer stripped, decl kept */
+                    /* unused          -> removed entirely                 */
+float calArea(float radius)
+{
+    return PI * radius * radius;
+}
+void rectangle(float w, float h, Shape *shape)
+{
+    shape->area = w * h;
+    shape->perimeter = 2 * (w + h);
+}
+/* --- Function under test --- */
+void circle(float radius, Shape *shape)
+{
+    float tempArea = calArea(radius);
+    if (tempArea <= 10.0f)
+        shape->area = tempArea + area;
+    else
+        shape->area = tempArea;
+    shape->perimeter = 2 * PI * radius;
+}
+
+****The function under test ends****
+{"desc": "description text", "inputs": [{"expr": "radius", "type": "float", "value": 0.0}, {"expr": "area", "type": "int", "value": 0}, {"expr": "shape->area", "type": "float", "value": 0.0}, {"expr": "shape->perimeter", "type": "float", "value": 0.0}], "stubins": [{"funcName": "calArea", "expr": "returnValue", "type": "float", "value": [0.0]}], "outputs": [{"expr": "shape->area", "type": "float", "value": 0.0}, {"expr": "shape->perimeter", "type": "float", "value": 0.0}]}
+{other test cases}

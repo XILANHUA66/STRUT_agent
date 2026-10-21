@@ -1,0 +1,23 @@
+{
+  "cases": [
+    {
+      "desc": "seed case for circle",
+      "inputs": [
+        { "expr": "radius", "type": "float", "value": 0.0 },
+        { "expr": "area", "type": "int", "value": 0 },
+        { "expr": "shape->area", "type": "float", "value": 0.0 },
+        { "expr": "shape->perimeter", "type": "float", "value": 0.0 }
+      ],
+      "stubins": [
+        { "funcName": "calArea", "expr": "returnValue", "type": "float", "value": [0.0] }
+      ],
+      "outputs": [
+        { "expr": "shape->area", "type": "float", "value": 0.0 },
+        { "expr": "shape->perimeter", "type": "float", "value": 0.0 }
+      ]
+    }
+  ],
+  "defaultPTR": [
+    { "expr": "shape", "userVar": "shape" }
+  ]
+}

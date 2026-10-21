@@ -1,0 +1,84 @@
+```json
+[
+  {
+    "desc": "tempArea below threshold, positive global area, unit radius",
+    "inputs": [
+      {"expr": "radius", "type": "float", "value": 1.0},
+      {"expr": "area", "type": "int", "value": 2},
+      {"expr": "shape->area", "type": "float", "value": 0.0},
+      {"expr": "shape->perimeter", "type": "float", "value": 0.0}
+    ],
+    "stubins": [
+      {"funcName": "calArea", "expr": "returnValue", "type": "float", "value": [3.14]}
+    ],
+    "outputs": [
+      {"expr": "shape->area", "type": "float", "value": 5.14},
+      {"expr": "shape->perimeter", "type": "float", "value": 6.28}
+    ]
+  },
+  {
+    "desc": "tempArea equals threshold, true branch, positive global area, radius 2",
+    "inputs": [
+      {"expr": "radius", "type": "float", "value": 2.0},
+      {"expr": "area", "type": "int", "value": 5},
+      {"expr": "shape->area", "type": "float", "value": 100.0},
+      {"expr": "shape->perimeter", "type": "float", "value": 100.0}
+    ],
+    "stubins": [
+      {"funcName": "calArea", "expr": "returnValue", "type": "float", "value": [10.0]}
+    ],
+    "outputs": [
+      {"expr": "shape->area", "type": "float", "value": 15.0},
+      {"expr": "shape->perimeter", "type": "float", "value": 12.56}
+    ]
+  },
+  {
+    "desc": "tempArea above threshold, false branch, positive global area, radius 0.5",
+    "inputs": [
+      {"expr": "radius", "type": "float", "value": 0.5},
+      {"expr": "area", "type": "int", "value": 7},
+      {"expr": "shape->area", "type": "float", "value": 0.0},
+      {"expr": "shape->perimeter", "type": "float", "value": 0.0}
+    ],
+    "stubins": [
+      {"funcName": "calArea", "expr": "returnValue", "type": "float", "value": [12.5]}
+    ],
+    "outputs": [
+      {"expr": "shape->area", "type": "float", "value": 12.5},
+      {"expr": "shape->perimeter", "type": "float", "value": 3.14}
+    ]
+  },
+  {
+    "desc": "tempArea zero, true branch, negative global area, zero radius",
+    "inputs": [
+      {"expr": "radius", "type": "float", "value": 0.0},
+      {"expr": "area", "type": "int", "value": -3},
+      {"expr": "shape->area", "type": "float", "value": 5.0},
+      {"expr": "shape->perimeter", "type": "float", "value": 5.0}
+    ],
+    "stubins": [
+      {"funcName": "calArea", "expr": "returnValue", "type": "float", "value": [0.0]}
+    ],
+    "outputs": [
+      {"expr": "shape->area", "type": "float", "value": -3.0},
+      {"expr": "shape->perimeter", "type": "float", "value": 0.0}
+    ]
+  },
+  {
+    "desc": "tempArea large above threshold, false branch ignores global area, negative radius",
+    "inputs": [
+      {"expr": "radius", "type": "float", "value": -1.0},
+      {"expr": "area", "type": "int", "value": 100},
+      {"expr": "shape->area", "type": "float", "value": 0.0},
+      {"expr": "shape->perimeter", "type": "float", "value": 0.0}
+    ],
+    "stubins": [
+      {"funcName": "calArea", "expr": "returnValue", "type": "float", "value": [100.0]}
+    ],
+    "outputs": [
+      {"expr": "shape->area", "type": "float", "value": 100.0},
+      {"expr": "shape->perimeter", "type": "float", "value": -6.28}
+    ]
+  }
+]
+```

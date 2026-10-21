@@ -1,0 +1,50 @@
+/* ============================================================
+ * STRUT demo: focal method `circle`
+ * from the paper (Fig. 2), cleaned up so it compiles as-is.
+ *
+ * This file is the INPUT to the pipeline. It is never modified
+ * in place -- run_demo.py copies it to demo/_work/ first.
+ * ============================================================ */
+#define PI 3.14f
+/* --- unused, should be stripped by simplify_file --- */
+#define UNUSED_MACRO 42
+
+typedef struct
+{
+    float area;
+    float perimeter;
+} Shape;
+/* --- unused, should be stripped by simplify_file --- */
+typedef struct
+{
+    int year;
+    int month;
+    int day;
+} Date;
+enum Color { RED, GREEN, BLUE };
+/* --- prototypes, should be stripped by remove_function_declarations --- */
+float calArea(float radius);
+void rectangle(float w, float h, Shape *shape);
+
+/* --- globals --- */
+int area = 0;       /* used by circle  -> initializer stripped, decl kept */
+float length = 10;  /* unused          -> removed entirely                 */
+float calArea(float radius)
+{
+    return PI * radius * radius;
+}
+void rectangle(float w, float h, Shape *shape)
+{
+    shape->area = w * h;
+    shape->perimeter = 2 * (w + h);
+}
+/* --- Function under test --- */
+void circle(float radius, Shape *shape)
+{
+    float tempArea = calArea(radius);
+    if (tempArea <= 10.0f)
+        shape->area = tempArea + area;
+    else
+        shape->area = tempArea;
+    shape->perimeter = 2 * PI * radius;
+}
