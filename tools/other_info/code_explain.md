@@ -50,7 +50,7 @@ structure seed case生成代码如下
     # 首先需要SEED，也就是你得先准备好一个简单样例。    
     case, default_PTR, has_stub = case_generator(get_file(SEED))
     
-    # 我们扒开来看一个SEED文件需要什么
+    # 一个SEED文件需要什么
     def case_generator(case_content):
         case_content = json.loads(case_content)
         cases = case_content['cases']
