@@ -1,4 +1,4 @@
-# STCUT's Agent
+# STRUT's Agent
 
 一个基于 LLM Tool Calling 的 **C 语言单元测试生成 Agent**，目标是复现 STRUT（*Structured Seed Case Guided Unit Test Generation for C Programs using LLMs*）论文的流水线。
 
