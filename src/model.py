@@ -30,6 +30,7 @@ class model:
         toolmes=None
         if response.tool_calls !=None:
             toolmes=ToolcallMessage._toolcall_to_mas(response.tool_calls)
+            toolmes.add_content(Mes=Mes)
         return [Mes,toolmes]
 
     def tool_call(self,prompt:str,output_path:str=os.path.join(OUTPUT_DIR,"result.json")):

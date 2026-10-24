@@ -8,7 +8,8 @@ from src.message import ToolcallMessage
 from src.model import model
 from src.paths import ensure_output_dir
 from openai.types.chat import ChatCompletionMessageToolCall
-
+import inspect
+from typing import get_type_hints,Callable
 
 @dataclass
 class Tool:
@@ -16,6 +17,46 @@ class Tool:
     description: str | None
     parameters: dict
     execute: Callable[..., Any]
+
+    @classmethod
+    def Tool_building(cls,func:Callable):
+        sig = inspect.signature(func)
+        hints = get_type_hints(func)
+
+        type_map = {
+            str: "string",
+            int: "integer",
+            float: "number",
+            bool: "boolean",
+        }
+
+        properties = {}
+        required = []
+
+        for name, param in sig.parameters.items():
+            annotation = hints.get(name, str)
+
+            # 映射class:str到string
+            properties[name] = {
+                "type": type_map.get(annotation, "string")
+            }
+
+            if param.default is inspect.Parameter.empty:
+                required.append(name)
+
+        return cls(
+            name=func.__name__,
+            description=inspect.getdoc(func) or " ",
+            execute=func,
+            parameters={
+            "type": "object",
+            "properties": properties,
+            "required": required,
+            "additionalProperties": False,
+            },
+        )
+
+ 
 
     def transform_to_openai(self):
         _dict={
@@ -29,21 +70,38 @@ class Tool:
         }
         
         return _dict
-    
-    def using(self, parameters: dict) -> Any:
-        """用模型给出的参数执行工具。
 
-        parameters 来自 tool_call 的 arguments。模型返回的原始值是 JSON
-        字符串，已经在 ToolcallMessage._toolcall_to_mas 里 json.loads 成 dict，
-        这里直接用 ** 展开成关键字参数传给 execute。
-        """
+    def structure_output(self,**kwargs)->str:
+        type_map = {
+                    str: "string",
+                    int: "integer",
+                    float: "number",
+                    bool: "boolean",
+                }
+        
+        # sig=inspect.signature(self.execute)
+        # return_type=sig.return_annotation
+        try:
+            ans = self.execute(**kwargs)
+        except Exception as e:
+            return json.dumps({"success": False, "error": type(e).__name__,
+                       "message": str(e)}, ensure_ascii=False)
+        try:
+            return json.dumps({"success": True, "ans": ans}, ensure_ascii=False)
+        except TypeError as e:
+            return json.dumps({"success": False, "error": "SerializationError",
+                       "message": f"工具 {self.name} 的返回值无法 JSON 序列化: {e}, only support basic type return or list,dict"},
+                      ensure_ascii=False)
+  
+    def using(self, parameters: dict) -> Any:
+
         if not isinstance(parameters, dict):
             raise TypeError(
                 f"工具 {self.name} 的参数必须是 dict，"
                 f"收到 {type(parameters).__name__}"
             )
 
-        return self.execute(**parameters)
+        return self.structure_output(**parameters)
 
 
 
@@ -137,7 +195,7 @@ class STRUT_simlify(Tool):
 
         return prompt,default_PTR
 
-def simplify( input_path,case_path,output_path=None)->str:
+def simplify( input_path,case_path,output_path=None)->list:
     """
     根据 input_path 的 C 文件和 case_path 的样例文件，生成测试用例提示词。
 
@@ -159,83 +217,19 @@ def simplify( input_path,case_path,output_path=None)->str:
     - 成功：{"success": true, "prompt": "...", "PTR": [...]}
     - 失败：{"success": false, "error": "...", "message": "..."}
     """
-    try:
-        strut=STRUT_simlify(input_path,case_path,output_path)
-        prompt,PTR=strut.prompt_building()
-        ans={
-            "success":True,
-            "prompt":prompt,
-            "PTR":PTR,
-        }
-        return json.dumps(ans,ensure_ascii=False)
-    except Exception as e:
-        return json.dumps(
-            {
-                "success":False,
-                "error":type(e).__name__,
-                "message":str(e),
-            },
-            ensure_ascii=False,
-        )
-
-def Tool_simplify():
-    strut=Tool(
-        name="Tool_simplify",
-        description=simplify.__doc__,
-        execute=simplify,
-        parameters={
-        "type": "object",
-        "properties": {
-            "input_path": {"type": "string"},
-            "case_path": {"type": "string"},
-            "output_path": {
-                "type": ["string", "null"]
-            },
-        },
-        "required": [
-            "input_path",
-            "case_path",
-            "output_path",
-        ],
-        "additionalProperties": False,
-        },
-    )
-    return strut
+    strut=STRUT_simlify(input_path,case_path,output_path)
+    prompt,PTR=strut.prompt_building()
+    return [prompt,PTR]
 
 
-def prompt_to_model(input_prompt:str):
+def prompt_to_model(input_prompt:str)->str | None:
     """
     这一步是发送prompt到无/新记忆体的model，保存并然后获得输出
     """
-    try:
-        mod=model("deepseek-flash")
-        res=mod.tool_call(input_prompt)
-        return json.dumps({
-                "success":True,
-                "response":res,
-        },ensure_ascii=False)
-    except:
-        return json.dumps({
-            "success":False,
-            "response":"something woring"
-        },ensure_ascii=False)
+    mod=model("deepseek-flash")
+    res=mod.tool_call(input_prompt)
+    return res
 
-def Tool_PtoM():
-    strut=Tool(
-        name="prompt_to_model",
-        description=prompt_to_model.__doc__,
-        execute=prompt_to_model,
-        parameters={
-        "type": "object",
-        "properties": {
-            "input_prompt": {"type": "string"},
-        },
-        "required": [
-            "input_prompt"
-        ],
-        "additionalProperties": False,
-        },
-    )
-    return strut
 
+   
 

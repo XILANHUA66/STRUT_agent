@@ -7,7 +7,6 @@ class _UnsetType:
 
 _UNSET = _UnsetType()
 
-
 class Memory():
     def __init__(self,system_prompt:str):
         self.memory=[]
@@ -19,11 +18,13 @@ class Memory():
 
     # add memory
 
-    def _add_message_to_memory(self,message:Message):
+    def _add_mes_to_memory(
+            self,
+            mes:Message):
         
         _dict={
-            "role":message.get_type(),
-            "content":message.get_content()
+            "role":mes.get_type(),
+            "content":mes.get_content()
             }
         self.memory.append(_dict)
 
